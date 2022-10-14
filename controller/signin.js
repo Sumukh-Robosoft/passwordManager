@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt");
 const UserModel = require("../models/users")
 const JWT = require("jsonwebtoken")
+const fast2sms = require('fast-two-sms');
 
 const signin = async (req,res) =>{
     const phoneNumber= req.body.phoneNumber;
@@ -24,6 +25,9 @@ const token = await JWT.sign(payload,secretKey,option)
      res.send(token)
 }
 
- 
+
+const forgotPassword = async(req,res)=>{
+
+}
 
 module.exports = signin

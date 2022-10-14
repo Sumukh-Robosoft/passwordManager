@@ -11,7 +11,7 @@ const addSite = async(req,res) =>{
         siteName:req.body.siteName,
         sector:req.body.sector,
         userName:req.body.userName,
-        sitePassword:cryptr.encrypt(req.body.sitePassword,10),
+        sitePassword:cryptr.encrypt(req.body.sitePassword),
         notes:req.body.notes
     })
     try {
@@ -28,7 +28,7 @@ const editSite = async (req,res) =>{
    await  siteModel.findOneAndUpdate({URL:req.body.URL},{
         siteName:req.body.siteName,
         userName:req.body.userName,
-        sitePassword:cryptr.encrypt(req.body.sitePassword,10),
+        sitePassword:cryptr.encrypt(req.body.sitePassword),
         notes:req.body.notes
     }).then(()=>{
         res.send("updated")
@@ -92,9 +92,9 @@ const viewPassword = async(req,res)=>{
 const searchSite = async(req,res) =>{
    try{
    const siteResults=await siteModel.find({$or: 
-       [{notes: req.body.notes}
-        ,{sector: req.body.sector},
-        {userName: req.body.userName}
+       [{notes:{$regex:req.body.text} }
+        ,{sector: {$regex:req.body.text}},
+        {userName: {$regex:req.body.text}}
         ]
     
     })
