@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
-const validator = require('validator');
+
+require("dotenv").config()
 
 const userSchema =new mongoose.Schema({
     phoneNumber : {
@@ -14,14 +15,18 @@ const userSchema =new mongoose.Schema({
         unique:true
     },
     mpin:{
-        type:Number,
+        type:String,
         maxlength:4,
         minlength:4
     },
     mpinHash : {
         type : String,
         
+    },
+    token :{
+        type:String
     }
 });
+
 
 module.exports = mongoose.model("UserSchema",userSchema)

@@ -1,19 +1,13 @@
 const siteModel = require("../models/sites");
+const userModel = require("../models/users")
 const Cryptr = require('cryptr');
 const cryptr = new Cryptr(process.env.ENCRYPT_KEY);
+const bcrypt = require("bcrypt")
 
 
 //ADD NEW SITES
 const addSite = async(req,res) =>{
-    const newSite = new siteModel({
-        mobile:req.user.phoneNumber,
-        URL:req.body.URL,
-        siteName:req.body.siteName,
-        sector:req.body.sector,
-        userName:req.body.userName,
-        sitePassword:cryptr.encrypt(req.body.sitePassword),
-        notes:req.body.notes
-    })
+    const newSite = new siteModel(req.body)
     try {
         await newSite.save()
         res.status(200).send("site added Successfully")
@@ -25,7 +19,7 @@ const addSite = async(req,res) =>{
 
 //EDIT EXISTING SITE
 const editSite = async (req,res) =>{
-   await  siteModel.findOneAndUpdate({URL:req.body.URL},{
+   await  siteModel.findOneAndUpdate({$and:[{_id:req.body._id},{mobile:req.user.phoneNumber}]},{
         siteName:req.body.siteName,
         userName:req.body.userName,
         sitePassword:cryptr.encrypt(req.body.sitePassword),
@@ -37,14 +31,17 @@ const editSite = async (req,res) =>{
 
 //DELETE SITE
 const deleteSite = async (req,res)=>{
-    await siteModel.findOneAndDelete({URL:req.body.URL}, function (err, docs){
+    await siteModel.findOneAndDelete({$and:[{_id:req.body._id},{mobile:req.user.phoneNumber}]}, function (err, docs){
        if (err){
            res.send(err)
        }
-       else{
-         res.status(200).send("deleted");
+       else if(docs == null){
+        res.status(404).send("not found");
        }
-   }).clone();
+       else{
+         res.status(200).send("deleted site");
+       }
+   }).clone(); 
 }
 
 //VIEW ALL SITES
@@ -88,13 +85,15 @@ const viewPassword = async(req,res)=>{
     }
 }
 
+
+
 //SEARCH SITE BASED ON NOTES/SECTOR/USERNAME
 const searchSite = async(req,res) =>{
    try{
    const siteResults=await siteModel.find({$or: 
        [{notes:{$regex:req.body.text} }
         ,{sector: {$regex:req.body.text}},
-        {userName: {$regex:req.body.text}}
+        {userName: {$regex:req.body.text}  }
         ]
     
     })
@@ -105,5 +104,21 @@ const searchSite = async(req,res) =>{
    }
     
 }
-module.exports={ addSite, editSite,deleteSite,viewSite,filteredView,viewPassword,searchSite}
+
+
+//Update Mpin
+const resetPassword = async(req,res)=>{
+    await userModel.findOneAndUpdate({phoneNumber:req.body.phoneNumber},{
+        mpinHash: await bcrypt.hash(req.body.mpin.toString(),10)
+    }).then(()=>{
+        res.send("Mpin Reset successful")
+    }).catch(error=>res.send(error))   
+}
+
+const signout = async(req,res)=>{
+    req.headers["authorization"] = null
+    res.send("logged out")
+ 
+ }
+module.exports={ addSite, editSite,deleteSite,viewSite,filteredView,viewPassword,searchSite,resetPassword}
 
