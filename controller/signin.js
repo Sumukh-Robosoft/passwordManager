@@ -58,14 +58,15 @@ const refresh = (req,res) => {
         console.log(err)
     }
 }  
-const forgotPassword = async(req,res)=>{
-    let otp = Math.floor(1000 + Math.random() * 9000)
-    const number = req.body.phoneNumber
-    const response = await fast2sms.sendMessage({authorization : process.env.API_KEY, otp :otp, 
-        numbers:number })
-    res.send(response)
+const  signout= async(req,res)=>{
+        UserModel.findOneAndUpdate({phoneNumber:req.body.phoneNumber},{
+             $unset: { token: ""} }
+        ).then(()=>{
+            res.json({"user":req.body.phoneNumber,
+            "loggedOut":true})
+        }).catch(err=>res.send(err))
 }
 
 
 
-module.exports = {signin,refresh}
+module.exports = {signin,refresh,signout}
