@@ -44,27 +44,32 @@ const refresh = (req,res) => {
     try{
         UserModel.findOne({ token:refreshToken}, (err, doc) =>{ 
             if (!doc)
-                console.log({ error: true, message: "Invalid refresh token" })
+               res.json({ error: true, message: "Invalid refresh token" })
             });
         JWT.verify(refreshToken.toString(), privateKey.toString(), (err, tokenDetails) => {
             if (err)
-              console.log({ error: true, message: "Invalid refresh token" })
+              res.json({ error: true, message: "Invalid refresh token" })
             });
     const accessToken = JWT.sign({phoneNumber:req.user.phoneNumber},process.env.REFRESH_TOKEN_SECRET,{expiresIn:"15m"})
     res.json({accessToken:accessToken})
         
     }
     catch(err){
-        console.log(err)
+        res.send(err)
     }
 }  
 const  signout= async(req,res)=>{
-        UserModel.findOneAndUpdate({phoneNumber:req.body.phoneNumber},{
-             $unset: { token: ""} }
-        ).then(()=>{
-            res.json({"user":req.body.phoneNumber,
-            "loggedOut":true})
-        }).catch(err=>res.send(err))
+        try{
+            const user = await UserModel.findOne({phoneNumber:req.body.phoneNumber});
+            if(!user){
+                res.send("Not logged in")
+            }
+            await user.updateOne({$unset:{token:""}})
+            res.send("logged out successfully")
+        }
+        catch(err){
+            res.send(err)
+        }
 }
 
 
