@@ -28,48 +28,36 @@ const token = await JWT.sign(payload,secretKey,option)
 const refreshToken = JWT.sign({
         phoneNumber: payload,
     }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '1d' });
-    res.cookie('JWT', refreshToken, { httpOnly: true, 
-        sameSite: 'None', 
-        maxAge: 24 * 60 * 60 * 1000 });
 await UserModel.findOneAndUpdate({phoneNumber:req.body.phoneNumber},{
     token:refreshToken
 }).then(()=>{
-    res.send(token)
+    res.json({"AccessToken":token,
+    "refreshToken":refreshToken
+})
 }).catch(error=>res.send(error))   
     
 }
 
-const refresh = async(req,res)=>{
-    
-    if (req.cookies?.JWT) {
-        const refreshToken =UserModel.findOne(req.body.phoneNumber);
-
-        JWT.verify(refreshToken.token, process.env.REFRESH_TOKEN_SECRET, 
-        (err, decoded) => {
-            if (err) {
-
-                return res.status(406).json({ message: 'Unauthorized' });
-            }
-            else {
-                
-                const token = JWT.sign({
-                 phoneNumber: req.body.phoneNumber,
-                    
-                }, process.env.SECRET_CODE, {
-                    expiresIn: '10m'
-                });
-                return res.json({ token });
-            }
-        })
-    } else {
-        return res.status(406).json({ message: 'Unauthorized' });
+const refresh = (req,res) => {
+    const refreshToken= req.body.token
+    const privateKey = process.env.REFRESH_TOKEN_SECRET;
+    try{
+        UserModel.findOne({ token:refreshToken}, (err, doc) =>{ 
+            if (!doc)
+                console.log({ error: true, message: "Invalid refresh token" })
+            });
+        JWT.verify(refreshToken.toString(), privateKey.toString(), (err, tokenDetails) => {
+            if (err)
+              console.log({ error: true, message: "Invalid refresh token" })
+            });
+    const accessToken = JWT.sign({phoneNumber:req.user.phoneNumber},process.env.REFRESH_TOKEN_SECRET,{expiresIn:"15m"})
+    res.json({accessToken:accessToken})
+        
     }
-}
-    
-
-
-
-
+    catch(err){
+        console.log(err)
+    }
+}  
 const forgotPassword = async(req,res)=>{
     let otp = Math.floor(1000 + Math.random() * 9000)
     const number = req.body.phoneNumber
