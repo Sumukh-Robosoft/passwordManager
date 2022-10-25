@@ -7,7 +7,14 @@ const bcrypt = require("bcrypt")
 
 //ADD NEW SITES
 const addSite = async(req,res) =>{
-    const newSite = new siteModel(req.body)
+    const newSite = new siteModel({
+        "mobile":req.user.phoneNumber,
+       "URL":req.body.URL,
+        "siteName":req.body.siteName,
+        "userName":req.body.userName,
+        "sitePassword":req.body.sitePassword,
+        "notes":req.body.notes
+    })
     try {
         await newSite.save()
         res.status(200).send("site added Successfully")
@@ -115,10 +122,6 @@ const resetPassword = async(req,res)=>{
     }).catch(error=>res.send(error))   
 }
 
-const signout = async(req,res)=>{
-    req.headers["authorization"] = null
-    res.send("logged out")
- 
- }
+
 module.exports={ addSite, editSite,deleteSite,viewSite,filteredView,viewPassword,searchSite,resetPassword}
 

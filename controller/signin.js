@@ -1,9 +1,6 @@
 const bcrypt = require("bcrypt");
 const UserModel = require("../models/users")
-const JWT = require("jsonwebtoken")
-const fast2sms = require('fast-two-sms');
-const cookieparser = require('cookie-parser');
-const bodyParser = require('body-parser');
+const JWT = require("jsonwebtoken") 
 require("dotenv").config()
 
 const signin = async (req,res) =>{
@@ -32,7 +29,7 @@ await UserModel.findOneAndUpdate({phoneNumber:req.body.phoneNumber},{
     token:refreshToken
 }).then(()=>{
     res.json({"AccessToken":token,
-    "refreshToken":refreshToken
+   
 })
 }).catch(error=>res.send(error))   
     

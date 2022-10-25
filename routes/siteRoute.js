@@ -9,5 +9,5 @@ router.get("/viewSite",authorization,viewSite)
 router.post("/filterSite",authorization,filteredView)
 router.post("/viewPassword",authorization,viewPassword)
 router.post("/searchSite",authorization,searchSite)
-router.post("/resetMpin",authorization,resetPassword)
+router.post("/resetMpin",resetPassword)
 module.exports = router
