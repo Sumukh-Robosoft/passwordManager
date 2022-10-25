@@ -19,7 +19,7 @@ const payload = {
 }
 const secretKey = process.env.SECRET_CODE
 const option = {
-    expiresIn:"60m",
+    expiresIn:"15m",
 }
 const token = await JWT.sign(payload,secretKey,option)
 const refreshToken = JWT.sign({
@@ -36,28 +36,30 @@ await UserModel.findOneAndUpdate({phoneNumber:req.body.phoneNumber},{
 }
 
 const refresh = (req,res) => {
-    const refreshToken= req.body.token
-    const privateKey = process.env.REFRESH_TOKEN_SECRET;
     try{
-        UserModel.findOne({ token:refreshToken}, (err, doc) =>{ 
-            if (!doc)
-               res.json({ error: true, message: "Invalid refresh token" })
-            });
-        JWT.verify(refreshToken.toString(), privateKey.toString(), (err, tokenDetails) => {
-            if (err)
-              res.json({ error: true, message: "Invalid refresh token" })
-            });
-    const accessToken = JWT.sign({phoneNumber:req.user.phoneNumber},process.env.REFRESH_TOKEN_SECRET,{expiresIn:"15m"})
-    res.json({accessToken:accessToken})
-        
+       const user = UserModel.find({ token:req.body.token}).clone()
+        if (!user){
+            res.json({ error: true, message: "kindly Login" })
+        }
+        else{
+            JWT.verify(req.body.token.toString(),process.env.REFRESH_TOKEN_SECRET.toString(), (err, tokenDetails) => {
+                if (err)
+                  res.json({ error: true, message: "Invalid refresh token" })
+                })
+            
+            const accessToken = JWT.sign({phoneNumber:req.body.phoneNumber},process.env.SECRET_CODE,{expiresIn:"15m"})
+            res.json({accessToken:accessToken})
+        }
     }
-    catch(err){
+catch(err){
         res.send(err)
     }
 }  
+
+
 const  signout= async(req,res)=>{
         try{
-            const user = await UserModel.findOne({phoneNumber:req.body.phoneNumber});
+            const user = await UserModel.findOne({token:req.body.token});
             if(!user){
                 res.send("Not logged in")
             }

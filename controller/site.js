@@ -10,9 +10,10 @@ const addSite = async(req,res) =>{
     const newSite = new siteModel({
         "mobile":req.user.phoneNumber,
        "URL":req.body.URL,
+       "sector":req.body.sector,
         "siteName":req.body.siteName,
         "userName":req.body.userName,
-        "sitePassword":req.body.sitePassword,
+        "sitePassword":cryptr.encrypt(req.body.sitePassword),
         "notes":req.body.notes
     })
     try {
