@@ -35,10 +35,10 @@ await UserModel.findOneAndUpdate({phoneNumber:req.body.phoneNumber},{
     
 }
 
-const refresh = (req,res) => {
+const refresh =async (req,res) => {
     try{
-       const user = UserModel.find({ token:req.body.token}).clone()
-        if (!user){
+       const user = await UserModel.find({token:req.body.token})
+        if (user[0].token == null){
             res.json({ error: true, message: "kindly Login" })
         }
         else{

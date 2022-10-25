@@ -5,6 +5,7 @@ require('dotenv').config()
 const signupRoute = require("./routes/signupRoute")
 const signinRoute = require("./routes/signinRoute")
 const site = require("./routes/siteRoute")
+const forgot = require("./routes/forgotpassword")
 
 
 
@@ -14,6 +15,7 @@ app.use(express.json())
 app.use('/',signupRoute)
 app.use('/',signinRoute)
 app.use('/',site)
+app.use('/',forgot)
 
 
 

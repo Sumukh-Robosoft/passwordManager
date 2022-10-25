@@ -116,11 +116,29 @@ const searchSite = async(req,res) =>{
 
 //Update Mpin
 const resetPassword = async(req,res)=>{
-    await userModel.findOneAndUpdate({phoneNumber:req.body.phoneNumber},{
-        mpinHash: await bcrypt.hash(req.body.mpin.toString(),10)
-    }).then(()=>{
-        res.send("Mpin Reset successful")
-    }).catch(error=>res.send(error))   
+    const oldMpin = req.body.oldMpin;
+    const mpin=req.body.newMpin;
+    const user =await userModel.findOne({phoneNumber:req.body.phoneNumber})
+    const isMatch =await bcrypt.compare(oldMpin.toString(),user.mpinHash)
+   try{ 
+    if(isMatch && user){
+        await userModel.findOneAndUpdate({
+            phoneNumber:req.body.phoneNumber},
+           { mpinHash: await bcrypt.hash(mpin.toString(),10)},(err,dos)=>{
+            if(err){
+                res.send(err)
+            }
+            res.send("Mpin updated")
+           }).clone()
+        
+    }
+    else{
+        res.send("Invalid Credentials")
+    } 
+}
+catch(err){
+    res.send(err)
+}
 }
 
 
