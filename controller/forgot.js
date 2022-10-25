@@ -28,9 +28,10 @@ const verifyOtp = async(req, res) => {
     const otp = req.body.token;
     const phoneNumber=req.body.phoneNumber;
     const mpinHash = await bcrypt.hash( req.body.mpin,10)
-    const user =  UserModel.findOne({phoneNumber:phoneNumber})
-    const verfied = speakeasy.totp.verify({secret: req.body.secret, encoding: 'base32', token: otp,window:0,step:60});
-    if(verfied){
+    const user =await  UserModel.findOne({phoneNumber:phoneNumber})
+    console.log(user)
+    const verified = speakeasy.totp.verify({secret: req.body.secret, encoding: 'base32', token: otp,window:0,step:60});
+    if(user != null && verified){
             user.updateOne({mpinHash:mpinHash},(err,docs)=>{
                if(err){
                   return res.send(err)
@@ -40,7 +41,7 @@ const verifyOtp = async(req, res) => {
            
        }
     else{
-        res.send("invalid otp")
+        res.send("invalid otp/phoneNumber")
     }
 }
 
