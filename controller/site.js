@@ -68,11 +68,18 @@ catch(err){
 
 //VIEW SITES BASED ON SECTOR/FOLDER
 const filteredView = async(req,res)=>{
-    try{
-        const fliteredResponse = await siteModel.find({$and:[{sector:req.body.sector},{mobile:req.user.phoneNumber}]
-           
-    })
+    try{ 
+        const text = req.body.sector;
+       if(text == "all"){
+        const fliteredResponse = await siteModel.find({$or:[{sector:text},{mobile:req.user.phoneNumber}]})
         res.send(fliteredResponse)
+       } 
+       else{
+        const fliteredResponse = await siteModel.find({$and:[{sector:text},{mobile:req.user.phoneNumber}]})
+        res.send(fliteredResponse)
+       }
+        
+        
     }
     catch(err){
         res.status(404).send("Not found")
