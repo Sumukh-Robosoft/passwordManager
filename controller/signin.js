@@ -15,14 +15,12 @@ const signin = async (req,res) =>{
    if(!isMatch){
     return res.status(401).send("Invalid credentials")
 }
-const payload = {
+
+const token = await JWT.sign({
     phoneNumber:req.body.phoneNumber
-}
-const secretKey = process.env.SECRET_CODE
-const option = {
+},process.env.SECRET_CODE,{
     expiresIn:"15m",
-}
-const token = await JWT.sign(payload,secretKey,option)
+})
 const refreshToken = JWT.sign({
         phoneNumber: payload,
     }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '1d' });
@@ -110,7 +108,7 @@ const verifyOtp = async(req, res) => {
            
        }
     else{
-        res.send("invalid otp/phoneNumber")
+        res.send("invalid credentials")
     }
 }
 module.exports = {signin,refresh,signout,getOtp,verifyOtp}

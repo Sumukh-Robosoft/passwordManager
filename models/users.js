@@ -26,6 +26,10 @@ const userSchema =new mongoose.Schema({
     token :{
         type:String,
         default:""
+    },
+    createdAt :{
+        type:Date,
+        default:Date.now()
     }
 });
 
