@@ -20,7 +20,7 @@ const siteSchema = new mongoose.Schema({
         type:String,
         required:true
     },
-    sitePassword:{
+    sitePassword:{ 
         type:String,
         required:true
     },

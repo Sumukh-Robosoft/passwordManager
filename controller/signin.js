@@ -15,7 +15,7 @@ const signin = async (req,res) =>{
    if(!isMatch){
     return res.status(401).send("Invalid credentials")
 }
-
+  
 const token = await JWT.sign({
     phoneNumber:req.body.phoneNumber
 },process.env.SECRET_CODE,{

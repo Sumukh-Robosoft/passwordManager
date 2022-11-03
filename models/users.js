@@ -7,7 +7,7 @@ const userSchema =new mongoose.Schema({
         type :Number,
         validate: {
             validator: function(v) {
-                return /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/.test(v)
+                return /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-.  ]?([0-9]{4})$/.test(v)
             },
             message: 'Please enter 10 digit Phone Number'
         },

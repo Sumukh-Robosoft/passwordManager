@@ -70,7 +70,7 @@ catch(err){
 const filteredView = async(req,res)=>{
     try{ 
         const text = req.body.sector;
-       if(text == "all"){
+       if(text == "all" ){
         const fliteredResponse = await siteModel.find({$or:[{sector:text},{mobile:req.user.phoneNumber}]})
         res.send(fliteredResponse)
        } 
